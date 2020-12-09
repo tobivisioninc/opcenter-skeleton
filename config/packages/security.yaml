@@ -1,0 +1,53 @@
+security:
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        # the name of your user provider can be anything
+        #users:
+        users:
+            id: Opcenter\RESTAPI\Security\UserProvider
+            #entity:
+            #    # the class of the entity that represents users
+            #    class: 'Opcenter\Data\Entity\V1\Token'
+            #    # the property to query by - e.g. username, email, etc
+            #    property: value
+            #    #property: 'email'
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            #security: false
+            anonymous: true
+            lazy: true
+            provider: users
+        main:
+            anonymous: ~
+            http_basic: ~
+            provider: users
+            guard:
+                authenticators:
+                    - Opcenter\RESTAPI\Security\TokenAuthenticator
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+
+        - { path: ^/form/?/?/?/?, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/form/?/?/?, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/v1/auth, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/v1/auth/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/logout, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        
+
+        - { path: ^/api/v1/?$, roles: [ROLE_USER, ROLE_ADMIN] }
+        - { path: ^/api/v1/*, roles: [ROLE_USER, ROLE_ADMIN] }
+        
+    encoders:
+        Opcenter\Data\Entity\V1\User: bcrypt
